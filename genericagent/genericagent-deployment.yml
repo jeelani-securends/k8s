@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:   
+  name: genericagent-deployment
+spec: 
+  selector:
+    matchLabels:
+      app: genericagent
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: genericagent
+    spec:
+      containers:
+        - name:  genericagent
+          image: gopalrao81/generic_agent
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 8082
+          env:
+            - name: GENERIC_AGENT_PORT
+              value: "8082"
+            - name:  GENERIC_AGENT_LOG
+              value: /var/log/genericAgent/generic_agent.log
+            - name:  CEM_USERNAME
+              value: admin@securends.com
+            - name:  CEM_URL
+              value: "http://192.168.1.245:32000"
+            - name:  CONTROLLER_CONTEXTPATH
+              value: "http://192.168.1.245:32300/api2"
+            - name:  GENERIC_CEM_URL
+              value: "http://192.168.1.245:32000"
+            - name:  FULL_SYNC_IN_MS
+              value: "30000"
+            - name:  SEMI_SYNC_IN_MS
+              value: "15000"
+            - name:  JAR_LOCATION
+              value: local
+            - name:  GENERIC_AGENT_LOCAL_CONTEXT_PATH
+              value: "http://192.168.1.245:8082/api"
+            - name:  GENERIC_AGENT_REMOTE_CONTEXT_PATH
+              value: "http://192.168.1.245:8082/api"
+          volumeMounts:
+            - name: genericagent-persistent-storage
+              mountPath: /var/lib/genericagent
+      volumes:
+        - name: genericagent-persistent-storage
+          persistentVolumeClaim:
+            claimName: genericagent-pv-claim

@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cemcon-mysql
+spec:
+  selector:
+    matchLabels:
+      app: cemcon-mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: cemcon-mysql
+    spec:
+      containers:
+        - image: mysql:5.7.27
+          imagePullPolicy: Always
+          name: cemcon-mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                  secretKeyRef:
+                    name:  mysqlrootpassword
+                    key: MYSQL_ROOT_PASSWORD
+            - name: MYSQL_DATABASE
+              valueFrom:
+                  secretKeyRef:
+                    name:  mysqldatabase
+                    key: MYSQL_DATABASE
+            - name: MYSQL_USER
+              valueFrom:
+                  secretKeyRef:
+                    name:  mysqluser
+                    key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                  secretKeyRef:
+                    name:  mysqlpassword
+                    key: MYSQL_PASSWORD
+          ports:
+            - containerPort: 3307
+              name: cemcon-mysql
+          volumeMounts:
+            - name: cemcon-mysql-persistent-storage
+              mountPath: /var/lib/cem/mysql
+      volumes:
+        - name: cemcon-mysql-persistent-storage
+          persistentVolumeClaim:
+            claimName: cemcon-mysql-pv-claim

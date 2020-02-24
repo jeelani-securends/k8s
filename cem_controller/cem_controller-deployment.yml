@@ -1,0 +1,129 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:   
+  name: cemcon-deployment
+spec: 
+  selector:
+    matchLabels:
+      app: cemcon
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: cemcon
+    spec:
+      containers:
+        - name:  cemcon
+          image: gopalrao81/cem_controller-sesloc-0.0.1
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 8080
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: Charter@123
+            - name: MYSQL_DATABASE
+              value: cem
+            - name: MYSQL_USER
+              value: securend
+            - name: ports
+              value: "3306"
+            - name: MYSQL_PASSWORD
+              value: securend
+            - name:  LOG_LEVEL
+              value: info
+            - name: ACTIVE_PROFILE
+              value: mysql
+            - name: DB_DRIVER_CLASS
+              value: com.mysql.jdbc.Driver
+            - name: PICKLES_LOG
+              value: /var/log/pickles/pickle.log
+            - name: DB_CONN_URL
+              value: "jdbc:mysql://192.168.1.246:31000/cem"
+            - name: DB_USER
+              value: root
+            - name: DB_PASS
+              value: Charter@123
+            - name : SHOW_SQL
+              value: "false"
+            - name: HIBERNATE_DIALECT
+              value: org.hibernate.dialect.MySQL55Dialect
+            - name: CUSTOMER_NAME
+              value: Deploy
+            - name: MAIL_FROM
+              value: cem@securends.com
+            - name: TEAM_NAME
+              value: IT Security
+            - name: NOTIFY
+              value: "true"
+            - name: CONTROLLER_DB_DRIVER_CLASS
+              value: com.mysql.jdbc.Driver
+            - name: CONTROLLER_DB_CONN_URL
+              value: "jdbc:mysql://192.168.1.246:31000/cem_controller"
+            - name: CONTROLLER_DB_USER
+              value: root
+            - name: CONTROLLER_DB_PASS
+              value: Charter@123
+            - name: CONTROLLER_HIBERNATE_DIALECT
+              value: org.hibernate.dialect.MySQL55Dialect
+            - name: CONTROLLER_CONTEXTPATH
+              value: "http://192.168.1.244:8030/api2"
+            - name: CEM_ENDPOINTS
+              value: "AD,OFFICE365,SHAREPOINT,SALESFORCE,SAP,GOOGLE DRIVE,DB,GITHUB,DROPBOX,AWS,BOX,WINDOWS SHARE,MYSQL,POSTGRES,ORACLE,JIRA,CONFLUENCE,SQL SERVER,SAP ERP,AX,OKTA,CUSTOM APPLICATION"
+            - name: ENABLE_TRACKER
+              value: "false"
+            - name: TRACKER_NAME
+              value: servicenow
+            - name: SCHEDULE_CAMPAIN_EXP
+              value: "0 0 12 * * ?"
+            - name: CAMPAIGN_CLOSE_REMINDER
+              value: "2"
+            - name: PICKLES_LOG
+              value: /var/log/pickles/pickle.log
+            - name: CONTROLLER_LOG
+              value: /var/log/controller/controller.log
+            - name: GENERIC_AGENT_LOG
+              value: /var/log/genericAgent/generic_agent.log
+            - name: SCHEDULE_PENDING_ACTION_EXP
+              value: "0 */5 * * * *"
+            - name: GENERIC_AGENT_CONTEXTPATH
+              value: "http://192.168.1.244:9085/api"
+            - name: SCHEDULE_ESCALATION_MAIL_EXP
+              value: "0 0 0 * * ?"
+            - name: FTP_FOLDER
+              value: /var/log/ftp/
+            - name: CEM_USERNAME
+              value: admin@securends.com
+            - name: CEM_PORT
+              value: "8080"
+            - name: GENERIC_AGENT_PORT
+              value: "9085"
+            - name: FULL_SYNC_IN_MS
+              value: "30000"
+            - name: SEMI_SYNC_IN_MS
+              value: "15000"
+            - name: GENERIC_AGENT_LOCAL_CONTEXT_PATH
+              value: "http://192.168.1.244:9085/api"
+            - name: GENERIC_AGENT_REMOTE_CONTEXT_PATH
+              value: "http://192.168.1.244:9085/api"
+            - name: JAR_LOCATION
+              value: local
+            - name: URL
+              value: "http://192.168.1.244:8080"
+            - name: CEM_URL
+              value: "http://192.168.1.244:8080"
+            - name: CAMPAIGN_CLOSE_REMINDER
+              value: "2"
+            - name: GENERIC_CEM_URL
+              value: "http://192.168.1.244:8080"
+            - name: GENERIC_AGENT_REMOTE_CEM_PATH
+              value: "http://192.168.1.244:8080"
+            - name: ZIPKING_URL
+              value: "http://192.168.1.114:9411"
+          volumeMounts:
+            - name: cemcon-persistent-storage
+              mountPath: /var/lib/cemcontroller
+      volumes:
+        - name: cemcon-persistent-storage
+          persistentVolumeClaim:
+            claimName: cemcon-pv-claim

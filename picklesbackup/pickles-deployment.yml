@@ -1,0 +1,143 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:   
+  name: pickles-deployment
+spec: 
+  selector:
+    matchLabels:
+      app: pickles
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: pickles
+    spec:
+      containers:
+        - name:  pickles
+          image: gopalrao81/k8s-demo:latest
+          imagePullPolicy: Always
+          ports:
+          - containerPort: 8080
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                  secretKeyRef:
+                    name:  mysqlrootpassword
+                    key: MYSQL_ROOT_PASSWORD
+            - name: MYSQL_DATABASE
+              valueFrom:
+                  secretKeyRef:
+                    name:  mysqldatabase
+                    key: MYSQL_DATABASE
+            - name: MYSQL_USER
+              valueFrom:
+                  secretKeyRef:
+                    name:  mysqluser
+                    key: MYSQL_USER
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                  secretKeyRef:
+                    name:  mysqlpassword
+                    key: MYSQL_PASSWORD
+            - name: ports
+              value: "3306"
+            - name:  LOG_LEVEL
+              value: info
+            - name: SCHEDULE_CAMPAIN_CSV
+              value: "0 0 12 * * ?"
+            - name: ACTIVE_PROFILE
+              value: mysql
+            - name: DB_DRIVER_CLASS
+              value: com.mysql.jdbc.Driver
+            - name: PICKLES_LOG
+              value: /var/log/pickles/pickle.log
+            - name: DB_CONN_URL
+              value: "jdbc:mysql://192.168.1.246:31000/cem"
+            - name: DB_USER
+              value: root
+            - name: DB_PASS
+              value: Charter@123
+            - name : SHOW_SQL
+              value: "false"
+            - name: HIBERNATE_DIALECT
+              value: org.hibernate.dialect.MySQL55Dialect
+            - name: CUSTOMER_NAME
+              value: Securends246
+            - name: MAIL_FROM
+              value: cem@securends.com
+            - name: TEAM_NAME
+              value: IT Security
+            - name: NOTIFY
+              value: "true"
+            - name: CONTROLLER_DB_DRIVER_CLASS
+              value: com.mysql.jdbc.Driver
+            - name: CONTROLLER_DB_CONN_URL
+              value: "jdbc:mysql://192.168.1.246:31000/cem_controller"
+            - name: CONTROLLER_DB_USER
+              value: root
+            - name: CONTROLLER_DB_PASS
+              value: Charter@123
+            - name: CONTROLLER_HIBERNATE_DIALECT
+              value: org.hibernate.dialect.MySQL55Dialect
+            - name: CONTROLLER_CONTEXTPATH
+              value: "http://192.168.1.245:32300/api2"
+            - name: CEM_ENDPOINTS
+              value: "AD,OFFICE365,SHAREPOINT,SALESFORCE,SAP,GOOGLE DRIVE,DB,GITHUB,DROPBOX,AWS,BOX,WINDOWS SHARE,MYSQL,POSTGRES,ORACLE,JIRA,CONFLUENCE,SQL SERVER,SAP ERP,AX,OKTA,CUSTOM APPLICATION"
+            - name: ENABLE_TRACKER
+              value: "false"
+            - name: TRACKER_NAME
+              value: servicenow
+            - name: SCHEDULE_CAMPAIN_EXP
+              value: "0 0 12 * * ?"
+            - name: CAMPAIGN_CLOSE_REMINDER
+              value: "2"
+            - name: PICKLES_LOG
+              value: /var/log/pickles/pickle.log
+            - name: CONTROLLER_LOG
+              value: /var/log/controller/controller.log
+            - name: GENERIC_AGENT_LOG
+              value: /var/log/genericAgent/generic_agent.log
+            - name: SCHEDULE_PENDING_ACTION_EXP
+              value: "0 */5 * * * *"
+            - name: GENERIC_AGENT_CONTEXTPATH
+              value: "http://192.168.1.245:30000/api"
+            - name: SCHEDULE_ESCALATION_MAIL_EXP
+              value: "0 0 0 * * ?"
+            - name: FTP_FOLDER
+              value: /var/log/ftp/
+            - name: CEM_USERNAME
+              value: admin@securends.com
+            - name: CEM_PORT
+              value: "8080"
+            - name: GENERIC_AGENT_PORT
+              value: "30000"
+            - name: FULL_SYNC_IN_MS
+              value: "30000"
+            - name: SEMI_SYNC_IN_MS
+              value: "15000"
+            - name: GENERIC_AGENT_LOCAL_CONTEXT_PATH
+              value: "http://192.168.1.245:30000/api"
+            - name: GENERIC_AGENT_REMOTE_CONTEXT_PATH
+              value: "http://192.168.1.245:30000/api"
+            - name: JAR_LOCATION
+              value: local
+            - name: URL
+              value: "http://192.168.1.246:32000"
+            - name: CEM_URL
+              value: "http://192.168.1.246:32000"
+            - name: CAMPAIGN_CLOSE_REMINDER
+              value: "2"
+            - name: GENERIC_CEM_URL
+              value: "http://192.168.1.245:30000"
+            - name: GENERIC_AGENT_REMOTE_CEM_PATH
+              value: "http://192.168.1.245:30000"
+            - name: ZIPKING_URL
+              value: "http://192.168.1.114:9411"
+          volumeMounts:
+            - name: pickles-persistent-storage
+              mountPath: /var/lib/pickles
+      volumes:
+        - name: pickles-persistent-storage
+          persistentVolumeClaim:
+            claimName: pickles-pv-claim
